@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Home, Plus, User, LogOut, Sparkles } from 'lucide-react';
+import { Home, Plus, User, LogOut, Sparkles,Image } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -47,6 +47,7 @@ const Navbar: React.FC = () => {
                     <span className="hidden sm:inline">Home</span>
                   </Button>
                 </Link>
+
                 <Link to="/create">
                   <Button 
                     variant={isActive('/create') ? 'default' : 'ghost'} 
@@ -57,6 +58,18 @@ const Navbar: React.FC = () => {
                     <span className="hidden sm:inline">Create</span>
                   </Button>
                 </Link>
+
+                <Link to="/ImageGeneration">
+                  <Button 
+                    variant={isActive('/ImageGeneration') ? 'default' : 'ghost'} 
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <Image className="w-4 h-4" />
+                      <span className='hidden sm:inline'>ImageGeneration</span>
+                  </Button>
+                </Link>
+                
                 <Link to="/profile">
                   <Button 
                     variant={isActive('/profile') ? 'default' : 'ghost'} 
@@ -75,6 +88,8 @@ const Navbar: React.FC = () => {
                     <span className="hidden sm:inline">{user?.username || 'Profile'}</span>
                   </Button>
                 </Link>
+
+
                 <Button 
                   variant="ghost" 
                   size="sm"

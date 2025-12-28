@@ -1,14 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { profileAPI, postsAPI, Post } from '@/services/api';
-import Navbar from '@/components/layout/Navbar';
-import PostCard from '@/components/posts/PostCard';
-import PostModal from '@/components/posts/PostModal';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { profileAPI, Post, postsAPI } from "@/services/api";
+import Navbar from "@/components/layout/Navbar";
+import PostCard from "@/components/posts/PostCard";
+import PostModal from "@/components/posts/PostModal";
+import EditPostModal from "@/components/posts/EditPostModel";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -16,34 +17,35 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { 
-  Camera, 
-  Edit2, 
-  Trash2, 
-  Loader2, 
+} from "@/components/ui/dialog";
+import {
+  Camera,
+  Edit2,
+  Trash2,
+  Loader2,
   User,
   Mail,
   Save,
   X,
-  AlertTriangle
-} from 'lucide-react';
+  AlertTriangle,
+} from "lucide-react";
 
 const Profile: React.FC = () => {
   const { user, updateUser, logout } = useAuth();
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [postCount,setPostCount] = useState(0)
-  
-  const [editUsername, setEditUsername] = useState(user?.username || '');
+  const [postCount, setPostCount] = useState(0);
+
+  const [editUsername, setEditUsername] = useState(user?.username || "");
   const [newImage, setNewImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -53,21 +55,14 @@ const Profile: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (user) {
-      setEditUsername(user.username);
-    }
+    if (user) setEditUsername(user.username);
   }, [user]);
 
   const loadUserData = async () => {
     try {
-      const profile = await profileAPI.getUserProfile()
-      
-      console.log(profile)
-
-      setPostCount(profile.postCount);      
-      setUserPosts(profile.posts)
- 
-
+      const profile = await profileAPI.getUserProfile();
+      setPostCount(profile.postCount);
+      setUserPosts(profile.posts);
     } catch (error) {
       toast({
         title: "Failed to load profile",
@@ -81,12 +76,10 @@ const Profile: React.FC = () => {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
+    if (file && file.type.startsWith("image/")) {
       setNewImage(file);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
+      reader.onloadend = () => setImagePreview(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
@@ -104,27 +97,25 @@ const Profile: React.FC = () => {
     setIsSaving(true);
     try {
       const formData = new FormData();
-      formData.append('username', editUsername.trim());
-
-      if (newImage) {
-        formData.append('image', newImage);
-      }
+      formData.append("username", editUsername.trim());
+      if (newImage) formData.append("image", newImage);
 
       const updatedUser = await profileAPI.updateProfile(formData);
       updateUser(updatedUser.user);
-      
+
       setIsEditing(false);
       setNewImage(null);
       setImagePreview(null);
+
       toast({
         title: "Profile updated",
         description: "Your changes have been saved",
       });
     } catch (error: any) {
-      const message = error.response?.data?.message || "Failed to update profile";
       toast({
         title: "Update failed",
-        description: message,
+        description:
+          error.response?.data?.message || "Failed to update profile",
         variant: "destructive",
       });
     } finally {
@@ -137,16 +128,16 @@ const Profile: React.FC = () => {
     try {
       await profileAPI.deleteAccount();
       logout();
-      navigate('/login');
+      navigate("/login");
       toast({
         title: "Account deleted",
         description: "Your account has been permanently deleted",
       });
     } catch (error: any) {
-      const message = error.response?.data?.message || "Failed to delete account";
       toast({
         title: "Deletion failed",
-        description: message,
+        description:
+          error.response?.data?.message || "Failed to delete account",
         variant: "destructive",
       });
     } finally {
@@ -157,7 +148,7 @@ const Profile: React.FC = () => {
 
   const cancelEdit = () => {
     setIsEditing(false);
-    setEditUsername(user?.username || '');
+    setEditUsername(user?.username || "");
     setNewImage(null);
     setImagePreview(null);
   };
@@ -167,16 +158,15 @@ const Profile: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
       <div className="pt-24 pb-8 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Profile Header */}
           <div className="bg-card rounded-3xl shadow-card p-8 mb-8 animate-fade-in">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
               {/* Avatar */}
-              <div className="relative group">
+              <div className="rel ative group">
                 {currentImage ? (
-                  <img 
+                  <img
                     src={currentImage}
                     alt={user?.username}
                     className="w-28 h-28 rounded-full object-cover ring-4 ring-border"
@@ -186,7 +176,7 @@ const Profile: React.FC = () => {
                     <User className="w-12 h-12 text-muted-foreground" />
                   </div>
                 )}
-                
+
                 {isEditing && (
                   <>
                     <button
@@ -236,11 +226,7 @@ const Profile: React.FC = () => {
                         )}
                         Save
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={cancelEdit}
-                      >
+                      <Button variant="ghost" size="sm" onClick={cancelEdit}>
                         <X className="w-4 h-4 mr-2" />
                         Cancel
                       </Button>
@@ -289,11 +275,14 @@ const Profile: React.FC = () => {
           </div>
 
           {/* User's Posts */}
-          <div className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          <div
+            className="animate-fade-in-up"
+            style={{ animationDelay: "100ms" }}
+          >
             <h2 className="font-display text-xl font-semibold text-foreground mb-6">
               Your Posts
             </h2>
-            
+
             {isLoading ? (
               <div className="flex items-center justify-center py-16">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -320,7 +309,7 @@ const Profile: React.FC = () => {
                 <p className="text-muted-foreground mb-4">
                   Start sharing your creativity with the world!
                 </p>
-                <Button variant="gradient" onClick={() => navigate('/create')}>
+                <Button variant="gradient" onClick={() => navigate("/create")}>
                   Create your first post
                 </Button>
               </div>
@@ -334,17 +323,53 @@ const Profile: React.FC = () => {
         <PostModal
           post={selectedPost}
           onClose={() => setSelectedPost(null)}
-          onEdit={() => {
-            setSelectedPost(null);
-            // Handle edit navigation
-          }}
+          onEdit={() => setEditingPost(selectedPost)}
           onDelete={() => {
-            setUserPosts(prev => prev.filter(p => p._id !== selectedPost._id));
+            setUserPosts((prev) =>
+              prev.filter((p) => p._id !== selectedPost._id)
+            );
             setSelectedPost(null);
             toast({
               title: "Post deleted",
               description: "Your post has been removed",
             });
+          }}
+          showActions={true}
+        />
+      )}
+
+      {editingPost && (
+        <EditPostModal
+          open={!!editingPost}
+          post={editingPost}
+          onClose={() => setEditingPost(null)}
+          onSave={async ({ title, caption, tags }) => {
+            try {
+              const updated = await postsAPI.updatePost(
+                editingPost!._id,
+                title,
+                caption,
+                tags
+              );
+
+              setUserPosts((prev) =>
+                prev.map((p) => (p._id === updated.post._id ? updated.post : p))
+              );
+
+              setEditingPost(null);
+
+              toast({
+                title: "Post updated",
+                description: "Your post has been successfully updated",
+              });
+            } catch (error: any) {
+              toast({
+                title: "Update failed",
+                description:
+                  error.response?.data?.message || "Failed to update post",
+                variant: "destructive",
+              });
+            }
           }}
         />
       )}
@@ -367,14 +392,12 @@ const Profile: React.FC = () => {
           </DialogHeader>
           <div className="py-4">
             <p className="text-muted-foreground">
-              Are you sure you want to delete your account? All of your posts and data will be permanently removed.
+              Are you sure you want to delete your account? All of your posts
+              and data will be permanently removed.
             </p>
           </div>
           <DialogFooter className="gap-2">
-            <Button
-              variant="ghost"
-              onClick={() => setShowDeleteDialog(false)}
-            >
+            <Button variant="ghost" onClick={() => setShowDeleteDialog(false)}>
               Cancel
             </Button>
             <Button
@@ -388,7 +411,7 @@ const Profile: React.FC = () => {
                   Deleting...
                 </>
               ) : (
-                'Delete Account'
+                "Delete Account"
               )}
             </Button>
           </DialogFooter>

@@ -128,11 +128,9 @@ const Home: React.FC = () => {
         <PostModal
           post={selectedPost}
           onClose={() => setSelectedPost(null)}
-          onEdit={() => {
-            // Handle edit
-            setSelectedPost(null);
-          }}
+          onEdit={() => {}}
           onDelete={() => handleDeletePost(selectedPost._id)}
+          showActions={false} // <-- Hide edit/delete on Home
         />
       )}
     </div>

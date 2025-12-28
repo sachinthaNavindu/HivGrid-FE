@@ -124,7 +124,7 @@ interface LoadUserDataResponse {
 
 
 export const authAPI = {
-  register: async (email, password, username,code) => {
+  register: async (email:string, password:string, username:string,code:string) => {
     return api.post("/api/HivGrid/auth/register", {
       email,
       password,
@@ -202,6 +202,11 @@ export const postsAPI = {
     });
     return response.data;
   },
+
+  updatePost: async(postId:string,title:string,caption:string,tags:string[])=>{
+    const response = await api.put("/api/HivGrid/post/updatePost",{postId,title,caption,tags})
+    return response.data
+  }
 };
 
 export default api;

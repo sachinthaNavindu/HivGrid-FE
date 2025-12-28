@@ -15,6 +15,7 @@ import Home from "./pages/Home";
 import CreatePost from "./pages/CreatePost";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import ImageGeneration from "./pages/ImageGeneration";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,12 @@ const App = () => (
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/ImageGeneration" element={
+              <ProtectedRoute>
+                <ImageGeneration />
               </ProtectedRoute>
             } />
             
