@@ -70,7 +70,6 @@ const ForgotPassword: React.FC = () => {
 
     setIsChangingPassword(true);
     try {
-      // Note: You may need to adjust this API call based on your backend
       await authAPI.forgotPassword(email);
       setIsSuccess(true);
       toast({

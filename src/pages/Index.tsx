@@ -7,7 +7,6 @@ import { Sparkles, ArrowRight, Image, Users, Heart } from 'lucide-react';
 const Index: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
-  // If authenticated, redirect to home
   if (!isLoading && isAuthenticated) {
     window.location.href = '/home';
     return null;
@@ -15,14 +14,12 @@ const Index: React.FC = () => {
 
   return (
     <div className="min-h-screen gradient-subtle overflow-hidden">
-      {/* Decorative background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
         <div className="absolute top-1/2 -left-40 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
         <div className="absolute -bottom-40 right-1/3 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
       </div>
 
-      {/* Navigation */}
       <nav className="relative z-10 flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-xl gradient-warm flex items-center justify-center shadow-md">
@@ -46,16 +43,13 @@ const Index: React.FC = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <main className="relative z-10 flex flex-col items-center justify-center px-6 py-20 text-center">
         <div className="max-w-4xl mx-auto animate-fade-in">
-          {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
             <Sparkles className="w-4 h-4" />
             Discover your creative potential
           </div>
 
-          {/* Headline */}
           <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
             Share Your
             <span className="block bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent">
@@ -63,13 +57,12 @@ const Index: React.FC = () => {
             </span>
           </h1>
 
-          {/* Subheadline */}
+
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
             Join a community of creators, share your ideas, and discover 
             inspiration from around the world. Your next masterpiece awaits.
           </p>
 
-          {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Link to="/register">
               <Button variant="gradient" size="xl" className="gap-2 min-w-[200px]">
@@ -85,7 +78,6 @@ const Index: React.FC = () => {
           </div>
         </div>
 
-        {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto animate-fade-in-up" style={{ animationDelay: '200ms' }}>
           <div className="bg-card p-6 rounded-2xl shadow-card hover-lift">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
@@ -125,7 +117,6 @@ const Index: React.FC = () => {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="relative z-10 text-center py-8 text-muted-foreground text-sm">
         <p>© 202 HivGrid. Made with creativity and passion.</p>
       </footer>

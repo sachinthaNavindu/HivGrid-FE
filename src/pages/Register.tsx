@@ -8,40 +8,36 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Mail, User, Lock, ArrowRight } from "lucide-react";
 
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { registerSchema } from "@/lib/validation";
+import { InferType } from "yup";
+
+type RegisterForm =InferType<typeof registerSchema>
+
 const Register: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { register, sendVerificationCode } = useAuth();
+  const { register: authRegister, sendVerificationCode } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm<RegisterForm>({
+    resolver: yupResolver(registerSchema),
+  });
 
-    if (!email || !username || !password) {
-      toast({
-        title: "Missing fields",
-        description: "Please fill in all fields",
-        variant: "destructive",
-      });
-      return;
-    }
+  const emailValue = watch("email");
 
-    if (password.length < 6) {
-      toast({
-        title: "Password too short",
-        description: "Password must be at least 6 characters",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const onSubmit = async (data: RegisterForm) => {
     setIsLoading(true);
+
     try {
-      await register(email, password, username,code);
+      await authRegister(data.email, data.password, data.username, data.code);
+
       toast({
         title: "Account created!",
         description: "Please check your email to verify your account.",
@@ -49,12 +45,11 @@ const Register: React.FC = () => {
 
       navigate("/login");
     } catch (error: any) {
-      const message =
-        error.response?.data?.message ||
-        "Registration failed. Please try again.";
       toast({
         title: "Registration failed",
-        description: message,
+        description:
+          error?.response?.data?.message ||
+          "Registration failed. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -67,64 +62,46 @@ const Register: React.FC = () => {
       title="Create your account"
       subtitle="Join Pinspire and start sharing your creativity"
     >
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="space-y-2">
-          <Label
-            htmlFor="email"
-            className="text-sm font-medium text-foreground"
-          >
-            Email
-          </Label>
+          <Label htmlFor="email">Email</Label>
           <div className="relative">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               id="email"
               type="email"
               placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-11"
               disabled={isLoading}
+              className="pl-11"
+              {...register("email")}
             />
           </div>
+          <p className="text-sm text-red-500">{errors.email?.message}</p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="code" className="text-sm font-medium text-foreground">
-            Verification Code
-          </Label>
+          <Label htmlFor="code">Verification Code</Label>
           <div className="relative">
             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               id="verify_code"
               type="text"
-              placeholder="Verification_code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              className="pl-11"
+              placeholder="Verification code"
               disabled={isLoading}
+              className="pl-11"
+              {...register("code")}
             />
           </div>
+          <p className="text-sm text-red-500">{errors.code?.message}</p>
         </div>
 
         <Button
           type="button"
           variant="secondary"
-          disabled={isLoading || !email}
-          className="whitespace-nowrap"
+          disabled={isLoading || !emailValue}
           onClick={async () => {
-            if (!email) {
-              toast({
-                title: "Email required",
-                description: "Please enter your email first.",
-                variant: "destructive",
-              });
-              return;
-            }
-
             try {
-              await sendVerificationCode(email)
-
+              await sendVerificationCode(emailValue);
               toast({
                 title: "Verification code sent",
                 description: "Check your email inbox.",
@@ -133,7 +110,7 @@ const Register: React.FC = () => {
               toast({
                 title: "Failed to send code",
                 description:
-                  error.response?.data?.message || "Something went wrong.",
+                  error?.response?.data?.message || "Something went wrong.",
                 variant: "destructive",
               });
             }
@@ -143,56 +120,38 @@ const Register: React.FC = () => {
         </Button>
 
         <div className="space-y-2">
-          <Label
-            htmlFor="username"
-            className="text-sm font-medium text-foreground"
-          >
-            Username
-          </Label>
+          <Label htmlFor="username">Username</Label>
           <div className="relative">
             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               id="username"
               type="text"
               placeholder="your_username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="pl-11"
               disabled={isLoading}
+              className="pl-11"
+              {...register("username")}
             />
           </div>
+          <p className="text-sm text-red-500">{errors.username?.message}</p>
         </div>
 
         <div className="space-y-2">
-          <Label
-            htmlFor="password"
-            className="text-sm font-medium text-foreground"
-          >
-            Password
-          </Label>
+          <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               id="password"
               type="password"
               placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-11"
               disabled={isLoading}
+              className="pl-11"
+              {...register("password")}
             />
           </div>
-          <p className="text-xs text-muted-foreground">
-            Must be at least 6 characters
-          </p>
+          <p className="text-sm text-red-500">{errors.password?.message}</p>
         </div>
 
-        <Button
-          type="submit"
-          variant="gradient"
-          className="w-full gap-2"
-          disabled={isLoading}
-        >
+        <Button type="submit" variant="gradient" className="w-full gap-2" disabled={isLoading}>
           {isLoading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -210,10 +169,7 @@ const Register: React.FC = () => {
       <div className="mt-6 text-center">
         <p className="text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-primary font-medium hover:underline"
-          >
+          <Link to="/login" className="text-primary font-medium hover:underline">
             Log in
           </Link>
         </p>

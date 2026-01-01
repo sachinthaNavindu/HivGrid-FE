@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
-// Pages
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -15,7 +14,7 @@ import Home from "./pages/Home";
 import CreatePost from "./pages/CreatePost";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
-import ImageGeneration from "./pages/ImageGeneration";
+import HirePage from "./pages/HirePage";
 
 const queryClient = new QueryClient();
 
@@ -27,13 +26,11 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             
-            {/* Protected Routes */}
             <Route path="/home" element={
               <ProtectedRoute>
                 <Home />
@@ -44,19 +41,20 @@ const App = () => (
                 <CreatePost />
               </ProtectedRoute>
             } />
+
+            <Route path="/hirePage" element={
+              <ProtectedRoute>
+                <HirePage />
+              </ProtectedRoute>
+            } 
+            
+            />
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
               </ProtectedRoute>
             } />
-
-            <Route path="/ImageGeneration" element={
-              <ProtectedRoute>
-                <ImageGeneration />
-              </ProtectedRoute>
-            } />
             
-            {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

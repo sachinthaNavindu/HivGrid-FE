@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Home, Plus, User, LogOut, Sparkles,Image } from 'lucide-react';
+import { Home, Plus, User, LogOut, Sparkles,ThumbsUp } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -20,7 +20,6 @@ const Navbar: React.FC = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-border/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link 
             to="/" 
             className="flex items-center gap-2 group"
@@ -33,7 +32,6 @@ const Navbar: React.FC = () => {
             </span>
           </Link>
 
-          {/* Navigation Links */}
           <div className="flex items-center gap-2">
             {isAuthenticated ? (
               <>
@@ -58,18 +56,18 @@ const Navbar: React.FC = () => {
                     <span className="hidden sm:inline">Create</span>
                   </Button>
                 </Link>
-
-                <Link to="/ImageGeneration">
+                
+                <Link to="/hirePage"> 
                   <Button 
-                    variant={isActive('/ImageGeneration') ? 'default' : 'ghost'} 
-                    size="sm"
-                    className="gap-2"
+                      variant={isActive('/hirePage')?'default':'ghost'}
+                      size='sm'
+                      className="gap-2"
                   >
-                    <Image className="w-4 h-4" />
-                      <span className='hidden sm:inline'>ImageGeneration</span>
+                    <ThumbsUp className='w-4 h-4' />
+                    <span className='hidden sm:inline'>Hire</span>
                   </Button>
                 </Link>
-                
+
                 <Link to="/profile">
                   <Button 
                     variant={isActive('/profile') ? 'default' : 'ghost'} 

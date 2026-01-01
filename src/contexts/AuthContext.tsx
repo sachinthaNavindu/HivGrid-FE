@@ -54,7 +54,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const response = await authAPI.login(email, password);
     setTokens(response.data.accessToken, response.data.refreshToken);
     
-    // Load user data after login
     const userData = await postsAPI.loadUserData();
     setUser(userData.user);
   };

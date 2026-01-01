@@ -46,7 +46,6 @@ const Home: React.FC = () => {
   });
 
   const handleDeletePost = async (postId: string) => {
-    // In a real app, this would call an API endpoint
     setPosts(prev => prev.filter(p => p._id !== postId));
     setSelectedPost(null);
     toast({
@@ -59,7 +58,6 @@ const Home: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      {/* Hero Section */}
       <div className="pt-24 pb-8 px-4 gradient-subtle">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8 animate-fade-in">
@@ -75,7 +73,6 @@ const Home: React.FC = () => {
             </p>
           </div>
 
-          {/* Search Bar */}
           <div className="max-w-xl mx-auto animate-fade-in" style={{ animationDelay: '100ms' }}>
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -91,7 +88,6 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Posts Grid */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {isLoading ? (
           <PostSkeleton />
@@ -123,14 +119,13 @@ const Home: React.FC = () => {
         )}
       </div>
 
-      {/* Post Modal */}
       {selectedPost && (
         <PostModal
           post={selectedPost}
           onClose={() => setSelectedPost(null)}
           onEdit={() => {}}
           onDelete={() => handleDeletePost(selectedPost._id)}
-          showActions={false} // <-- Hide edit/delete on Home
+          showActions={false} 
         />
       )}
     </div>

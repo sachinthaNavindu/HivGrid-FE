@@ -160,10 +160,8 @@ const Profile: React.FC = () => {
       <Navbar />
       <div className="pt-24 pb-8 px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Profile Header */}
           <div className="bg-card rounded-3xl shadow-card p-8 mb-8 animate-fade-in">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-              {/* Avatar */}
               <div className="rel ative group">
                 {currentImage ? (
                   <img
@@ -197,7 +195,6 @@ const Profile: React.FC = () => {
                 )}
               </div>
 
-              {/* User Info */}
               <div className="flex-1 text-center sm:text-left">
                 {isEditing ? (
                   <div className="space-y-4">
@@ -264,7 +261,6 @@ const Profile: React.FC = () => {
                 )}
               </div>
 
-              {/* Stats */}
               <div className="text-center px-6 py-3 bg-secondary/50 rounded-2xl">
                 <p className="font-display text-2xl font-bold text-foreground">
                   {postCount}
@@ -274,7 +270,6 @@ const Profile: React.FC = () => {
             </div>
           </div>
 
-          {/* User's Posts */}
           <div
             className="animate-fade-in-up"
             style={{ animationDelay: "100ms" }}
@@ -318,7 +313,6 @@ const Profile: React.FC = () => {
         </div>
       </div>
 
-      {/* Post Modal */}
       {selectedPost && (
         <PostModal
           post={selectedPost}
@@ -374,7 +368,6 @@ const Profile: React.FC = () => {
         />
       )}
 
-      {/* Delete Account Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

@@ -1,8 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
-const API_BASE_URL = "http://localhost:5000"; // Replace with actual API URL
+const API_BASE_URL = "http://localhost:5000"; 
 
-// Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -10,7 +9,6 @@ const api = axios.create({
   },
 });
 
-// Token management
 export const getAccessToken = (): string | null => {
   return localStorage.getItem("accessToken");
 };
@@ -29,7 +27,6 @@ export const clearTokens = (): void => {
   localStorage.removeItem("refreshToken");
 };
 
-// Request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
@@ -41,7 +38,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -81,7 +77,6 @@ api.interceptors.response.use(
   }
 );
 
-// Types
 export interface User {
   id?: string;
   email: string;
@@ -119,8 +114,35 @@ interface LoadUserDataResponse {
   posts:Post[]
 }
 
+export interface HiringAd {
+  _id: string;
+  description: string;
+  selectedSkills: string[];
+  email: string;
+  username: string;
+  whatsApp?: string;
+  createdAt: string;
+  updatedAt: string;
 
-// Auth endpoints
+  user: {
+    _id: string;
+    email: string;
+    username: string;
+    imageUrl?: string;
+  };
+}
+
+
+export interface HiringAdInput {
+  name:string
+  userEmail: string
+  description: string;
+  selectedSkills: string[];
+  countryCode: string;
+  phoneNumber: string;
+}
+
+
 
 
 export const authAPI = {
@@ -160,7 +182,6 @@ export const authAPI = {
   },
 };
 
-// Profile endpoints
 export const profileAPI = {
   getUserProfile: async (): Promise<LoadUserDataResponse> => {
     const response = await api.get("api/HivGrid/profile/userProfile");
@@ -182,7 +203,6 @@ export const profileAPI = {
   },
 };
 
-// Home/Posts endpoints
 export const postsAPI = {
   loadData: async (): Promise<Post[]> => {
     const response = await api.get("/api/HivGrid/home/loadData");
@@ -208,5 +228,17 @@ export const postsAPI = {
     return response.data
   }
 };
+
+ export const hireApi = {
+  createHiringAd: async (data: HiringAdInput) => {
+    const response = await api.post("/api/HivGrid/hire/publish", data);
+    return response.data;
+  },
+  getAllHiringAds: async (): Promise<HiringAd[] > => {
+    const response = await api.get("/api/HivGrid/hire/all");
+    return response.data.data;
+  },
+};
+
 
 export default api;

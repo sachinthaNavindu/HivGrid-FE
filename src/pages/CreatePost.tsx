@@ -1,42 +1,61 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { postsAPI } from '@/services/api';
-import Navbar from '@/components/layout/Navbar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { 
-  Upload, 
-  X, 
-  Image as ImageIcon, 
-  Tag, 
-  Type, 
+import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { postsAPI } from "@/services/api";
+
+import Navbar from "@/components/layout/Navbar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { createPostSchema } from "@/lib/validation";
+
+import { InferType } from "yup";
+
+import {
+  Upload,
+  X,
+  Image as ImageIcon,
+  Tag,
+  Type,
   AlignLeft,
   Loader2,
-  Sparkles 
-} from 'lucide-react';
+  Sparkles,
+} from "lucide-react";
+
+type CreatePostForm =InferType<typeof createPostSchema>
 
 const CreatePost: React.FC = () => {
-  const [title, setTitle] = useState('');
-  const [caption, setCaption] = useState('');
-  const [tags, setTags] = useState('');
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CreatePostForm>({
+    resolver: yupResolver(createPostSchema),
+    defaultValues: {
+      title: "",
+      caption: "",
+      tags: "",
+    },
+  });
 
   const handleImageChange = (file: File) => {
-    if (file && file.type.startsWith('image/')) {
+    if (file && file.type.startsWith("image/")) {
       setImage(file);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
+      reader.onloadend = () => setImagePreview(reader.result as string);
       reader.readAsDataURL(file);
     } else {
       toast({
@@ -47,42 +66,13 @@ const CreatePost: React.FC = () => {
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) handleImageChange(file);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
   const removeImage = () => {
     setImage(null);
     setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!title.trim()) {
-      toast({
-        title: "Title required",
-        description: "Please enter a title for your post",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const onSubmit = async (data: CreatePostForm) => {
     if (!image) {
       toast({
         title: "Image required",
@@ -93,24 +83,33 @@ const CreatePost: React.FC = () => {
     }
 
     setIsLoading(true);
+
     try {
       const formData = new FormData();
-      formData.append('title', title.trim());
-      formData.append('caption', caption.trim());
-      formData.append('tags', JSON.stringify(tags.split(',').map(t => t.trim()).filter(Boolean)));
-      formData.append('image', image);
+      formData.append("title", data.title.trim());
+      formData.append("caption", data.caption.trim());
+      formData.append(
+        "tags",
+        JSON.stringify(
+          data.tags.split(",").map((t) => t.trim()).filter(Boolean)
+        )
+      );
+      formData.append("image", image);
 
       await postsAPI.publish(formData);
+
       toast({
         title: "Post published!",
         description: "Your creation is now live",
       });
-      navigate('/');
+
+      navigate("/");
     } catch (error: any) {
-      const message = error.response?.data?.message || "Failed to publish post. Please try again.";
       toast({
         title: "Publishing failed",
-        description: message,
+        description:
+          error.response?.data?.message ||
+          "Failed to publish post. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -121,10 +120,9 @@ const CreatePost: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="pt-24 pb-8 px-4">
         <div className="max-w-3xl mx-auto">
-          {/* Header */}
           <div className="text-center mb-8 animate-fade-in">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
               <Sparkles className="w-4 h-4" />
@@ -135,125 +133,115 @@ const CreatePost: React.FC = () => {
             </h1>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in-up">
-            {/* Image Upload */}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-6 animate-fade-in-up"
+          >
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-foreground flex items-center gap-2">
-                <ImageIcon className="w-4 h-4" />
-                Image
+              <Label className="flex items-center gap-2">
+                <ImageIcon className="w-4 h-4" /> Image
               </Label>
-              
+
               {imagePreview ? (
                 <div className="relative rounded-2xl overflow-hidden shadow-card group">
-                  <img 
-                    src={imagePreview} 
-                    alt="Preview" 
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
                     className="w-full max-h-96 object-contain bg-muted"
                   />
                   <button
                     type="button"
                     onClick={removeImage}
-                    className="absolute top-4 right-4 p-2 rounded-full bg-foreground/80 text-background hover:bg-foreground transition-colors"
+                    className="absolute top-4 right-4 p-2 rounded-full bg-foreground/80 text-background hover:bg-foreground"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
                 <div
-                  onDrop={handleDrop}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const f = e.dataTransfer.files[0];
+                    if (f) handleImageChange(f);
+                    setIsDragging(false);
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
                   onClick={() => fileInputRef.current?.click()}
-                  className={`
-                    relative border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all
-                    ${isDragging 
-                      ? 'border-primary bg-primary/5' 
-                      : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                    }
-                  `}
+                  className={`relative border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all ${
+                    isDragging
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50 hover:bg-muted/50"
+                  }`}
                 >
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center">
-                      <Upload className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="text-foreground font-medium mb-1">
-                        Drop your image here or click to browse
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        PNG, JPG, GIF up to 10MB
-                      </p>
-                    </div>
-                  </div>
+                  <Upload className="w-8 h-8 mx-auto mb-3" />
+                  <p>Drop your image here or click to browse</p>
                   <input
                     ref={fileInputRef}
                     type="file"
                     accept="image/*"
-                    onChange={(e) => e.target.files?.[0] && handleImageChange(e.target.files[0])}
+                    onChange={(e) =>
+                      e.target.files?.[0] &&
+                      handleImageChange(e.target.files[0])
+                    }
                     className="hidden"
                   />
                 </div>
               )}
             </div>
 
-            {/* Title */}
-            <div className="space-y-2">
-              <Label htmlFor="title" className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Type className="w-4 h-4" />
-                Title
+            <div className="space-y-1">
+              <Label htmlFor="title" className="flex items-center gap-2">
+                <Type className="w-4 h-4" /> Title
               </Label>
               <Input
                 id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                {...register("title")}
                 placeholder="Give your post a title"
-                className="h-12"
-                disabled={isLoading}
               />
+              {errors.title && (
+                <p className="text-xs text-red-500">{errors.title.message}</p>
+              )}
             </div>
 
-            {/* Caption */}
-            <div className="space-y-2">
-              <Label htmlFor="caption" className="text-sm font-medium text-foreground flex items-center gap-2">
-                <AlignLeft className="w-4 h-4" />
-                Caption
+            <div className="space-y-1">
+              <Label htmlFor="caption" className="flex items-center gap-2">
+                <AlignLeft className="w-4 h-4" /> Caption
               </Label>
               <Textarea
                 id="caption"
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                placeholder="Tell us more about your creation..."
-                className="min-h-[120px] resize-none"
-                disabled={isLoading}
+                {...register("caption")}
+                placeholder="Tell us more..."
+                className="min-h-[120px]"
               />
+              {errors.caption && (
+                <p className="text-xs text-red-500">{errors.caption.message}</p>
+              )}
             </div>
 
-            {/* Tags */}
-            <div className="space-y-2">
-              <Label htmlFor="tags" className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Tag className="w-4 h-4" />
-                Tags
+            <div className="space-y-1">
+              <Label htmlFor="tags" className="flex items-center gap-2">
+                <Tag className="w-4 h-4" /> Tags
               </Label>
               <Input
                 id="tags"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-                placeholder="art, photography, design (comma separated)"
-                className="h-12"
-                disabled={isLoading}
+                {...register("tags")}
+                placeholder="art, photography, design"
               />
-              <p className="text-xs text-muted-foreground">
-                Separate tags with commas
-              </p>
+              {errors.tags && (
+                <p className="text-xs text-red-500">{errors.tags.message}</p>
+              )}
+              <p className="text-xs text-muted-foreground">Separate with commas</p>
             </div>
 
-            {/* Submit Button */}
-            <Button 
-              type="submit" 
-              variant="gradient"
-              size="lg"
+            <Button
+              type="submit"
               className="w-full"
               disabled={isLoading}
+              variant="gradient"
             >
               {isLoading ? (
                 <>

@@ -6,7 +6,7 @@ interface PostCardProps {
   post: Post;
   onClick: () => void;
   index: number;
-  showActions?: boolean; // <-- new prop to control Edit/Delete buttons
+  showActions?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
 }
@@ -28,7 +28,6 @@ const PostCard: React.FC<PostCardProps> = ({
       style={{ animationDelay: `${index * 50}ms` }}
     >
       <div className="card-elegant overflow-hidden">
-        {/* Image */}
         <div className="relative overflow-hidden">
           <img
             src={post.imageUrl}
@@ -37,12 +36,11 @@ const PostCard: React.FC<PostCardProps> = ({
             loading="lazy"
           />
 
-          {/* Conditional Edit/Delete Buttons */}
           {showActions && (
             <div className="absolute top-2 right-2 flex gap-1 z-10">
               <button
                 onClick={(e) => {
-                  e.stopPropagation(); // prevent opening the modal
+                  e.stopPropagation(); 
                   onEdit?.();
                 }}
                 className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 flex items-center gap-1"
@@ -61,7 +59,6 @@ const PostCard: React.FC<PostCardProps> = ({
             </div>
           )}
 
-          {/* Title + Caption */}
           <div className="p-3 space-y-1">
             <h3 className="text-sm font-semibold text-foreground line-clamp-1">
               {post.title}
@@ -75,7 +72,6 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
         </div>
 
-        {/* User info */}
         {user && (
           <div className="p-3 flex items-center gap-2">
             {user.imageUrl ? (

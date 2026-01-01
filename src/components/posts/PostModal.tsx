@@ -9,7 +9,7 @@ interface PostModalProps {
   onClose: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
-  showActions?: boolean; // <-- new prop
+  showActions?: boolean;  
 }
 
 const PostModal: React.FC<PostModalProps> = ({
@@ -17,7 +17,7 @@ const PostModal: React.FC<PostModalProps> = ({
   onClose,
   onEdit,
   onDelete,
-  showActions = false, // default false
+  showActions = false,
 }) => {
   const { user: currentUser } = useAuth();
 
@@ -40,7 +40,6 @@ const PostModal: React.FC<PostModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col md:flex-row h-full max-h-[90vh]">
-          {/* Image Section */}
           <div className="md:w-1/2 bg-muted flex items-center justify-center">
             <img
               src={post.imageUrl}
@@ -49,9 +48,7 @@ const PostModal: React.FC<PostModalProps> = ({
             />
           </div>
 
-          {/* Content Section */}
           <div className="md:w-1/2 p-6 flex flex-col overflow-y-auto">
-            {/* Header */}
             <div className="flex items-start justify-between mb-6">
               <div className="flex items-center gap-3">
                 {postUser?.imageUrl ? (
@@ -88,19 +85,16 @@ const PostModal: React.FC<PostModalProps> = ({
               </Button>
             </div>
 
-            {/* Title */}
             <h2 className="font-display text-2xl font-semibold text-foreground mb-4">
               {post.title}
             </h2>
 
-            {/* Caption */}
             {post.caption && (
               <p className="text-muted-foreground mb-6 leading-relaxed">
                 {post.caption}
               </p>
             )}
 
-            {/* Tags */}
             {post.tags?.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-6">
                 {post.tags.map((tag) => (
@@ -117,8 +111,7 @@ const PostModal: React.FC<PostModalProps> = ({
 
             <div className="flex-1" />
 
-            {/* Owner Actions */}
-            {isOwner && showActions && ( // <-- only show if owner AND showActions is true
+            {isOwner && showActions && ( 
               <div className="flex gap-3 pt-4 border-t border-border">
                 <Button
                   variant="outline"
