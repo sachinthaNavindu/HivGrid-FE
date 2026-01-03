@@ -52,7 +52,7 @@ api.interceptors.response.use(
         const refreshToken = getRefreshToken();
         if (refreshToken) {
           const response = await axios.post(
-            `${API_BASE_URL}/auth/refreshToken`,
+            `${API_BASE_URL}/api/HivGrid/auth/refreshToken`,
             {
               refreshToken,
             }
@@ -238,6 +238,16 @@ export const postsAPI = {
     const response = await api.get("/api/HivGrid/hire/all");
     return response.data.data;
   },
+
+  getMyHiringAd: async():Promise<HiringAd>=>{
+    const response = await api.get("/api/HivGrid/hire/getMyHiringAd")
+    return response.data.data
+  },
+
+  updateMyHiringAd: async(data) =>{
+    const response = await api.put("/api/HivGrid/hire/updateAd",data)
+    return response.data
+  }
 };
 
 

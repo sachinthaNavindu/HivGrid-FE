@@ -162,7 +162,7 @@ const Profile: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           <div className="bg-card rounded-3xl shadow-card p-8 mb-8 animate-fade-in">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-              <div className="rel ative group">
+              <div className="relative group">
                 {currentImage ? (
                   <img
                     src={currentImage}
