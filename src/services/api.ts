@@ -177,24 +177,24 @@ export const authAPI = {
   },
 
   forgotPassword: async (email: string) => {
-    const response = await api.post("api/HivGrid/auth/forgottPassword", { email });
+    const response = await api.post("/api/HivGrid/auth/forgottPassword", { email });
     return response.data;
   },
 
   verify: async (verificationCode: string) => {
-    const response = await api.post("api/HivGrid/auth/verify", { verificationCode });
+    const response = await api.post("/api/HivGrid/auth/verify", { verificationCode });
     return response.data;
   },
 
   refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
-    const response = await api.post("api/HivGrid/auth/refreshToken", { refreshToken });
+    const response = await api.post("/api/HivGrid/auth/refreshToken", { refreshToken });
     return response.data;
   },
 };
 
 export const profileAPI = {
   getUserProfile: async (): Promise<LoadUserDataResponse> => {
-    const response = await api.get("api/HivGrid/profile/userProfile");
+    const response = await api.get("/api/HivGrid/profile/userProfile");
     return response.data;
   },
 
@@ -208,7 +208,7 @@ export const profileAPI = {
   },
 
   deleteAccount: async () => {
-    const response = await api.post("api/HivGrid/profile/deleteAccount");
+    const response = await api.post("/api/HivGrid/profile/deleteAccount");
     return response.data;
   },
 };
