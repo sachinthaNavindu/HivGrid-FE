@@ -75,6 +75,8 @@
     const [loadingUserAd, setLoadingUserAd] = useState(false);
     const [userHiringAd, setUserHiringAd] = useState<HiringAd | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [enhancing, setEnhancing] = useState(false);
+
 
     const buildEmailBody = (person: HirePerson) => {
       return [
@@ -147,6 +149,29 @@
         .map((char) => 127397 + char.charCodeAt(0));
       return String.fromCodePoint(...codePoints);
     };
+
+    const handleEnhanceDescription = async () => {
+  if (!adForm.description.trim()) return;
+
+  try {
+    setEnhancing(true);
+
+    const response = await hireApi.hireAdDescriptionEnhance(
+      adForm.description
+    );
+
+    console.log(response)
+
+    setAdForm((prev) => ({
+      ...prev,
+      description: response.enhancedDescription,
+    }));
+  } catch (error) {
+    console.error("Failed to enhance description", error);
+  } finally {
+    setEnhancing(false);
+  }
+};
 
     const selectedCountry = useMemo(() => {
       return countryCodes.find((country) => country.code === adForm.countryCode);
@@ -798,6 +823,13 @@
                               rows={3}
                               className="min-h-[100px]"
                             />
+                              <Button
+                                type="button"
+                                onClick={handleEnhanceDescription}
+                                disabled={enhancing || !adForm.description.trim()}
+                              >
+                                {enhancing ? "Enhancing..." : "Enhance the description"}
+                              </Button>
                           </div>
 
                           <div className="space-y-2">

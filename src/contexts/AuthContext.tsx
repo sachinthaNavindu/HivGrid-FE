@@ -28,27 +28,28 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [postCount,setPostCount] = useState(0)
-  const [isLoading, setIsLoading] = useState(true);
+const [user, setUser] = useState<User | null>(null);
+const [postCount, setPostCount] = useState(0);
+const [authChecked, setAuthChecked] = useState(false);
 
-  useEffect(() => {
-    const loadUser = async () => {
+
+useEffect(() => {
+  const loadUser = async () => {
+    try {
       const token = getAccessToken();
       if (token) {
-        try {
-          const response = await postsAPI.loadUserData();
-          setUser(response.user);
-        } catch (error) {
-          console.error('Failed to load user:', error);
-          clearTokens();
-        }
+        const response = await postsAPI.loadUserData();
+        setUser(response.user);
       }
-      setIsLoading(false);
-    };
+    } catch (error) {
+      console.error("Auth check failed:", error);
+    } finally {
+      setAuthChecked(true); 
+    }
+  };
 
-    loadUser();
-  }, []);
+  loadUser();
+}, []);
 
   const login = async (email: string, password: string) => {
     const response = await authAPI.login(email, password);
@@ -80,13 +81,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       value={{
         user,
         postCount,
-        isAuthenticated: !!user,
-        isLoading,
+        isAuthenticated: authChecked && !!user,
+        isLoading: !authChecked,
         login,
         register,
         logout,
         updateUser,
-        sendVerificationCode
+        sendVerificationCode,
       }}
     >
       {children}

@@ -41,35 +41,42 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
+    if (!error.config) {
+      return Promise.reject(error);
+    }
+
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      try {
-        const refreshToken = getRefreshToken();
-        if (refreshToken) {
-          const response = await axios.post(
-            `${API_BASE_URL}/api/HivGrid/auth/refreshToken`,
-            {
-              refreshToken,
-            }
-          );
-
-          const { accessToken, refreshToken: newRefreshToken } = response.data;
-          setTokens(accessToken, newRefreshToken);
-
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          }
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
+      const refreshToken = getRefreshToken();
+      if (!refreshToken) {
         clearTokens();
-        window.location.href = "/login";
-        return Promise.reject(refreshError);
+        return Promise.reject(error);
+      }
+
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/HivGrid/auth/refreshToken",
+          { refreshToken }
+        );
+
+        const { accessToken, refreshToken: newRefreshToken } = res.data;
+
+        setTokens(accessToken, newRefreshToken);
+
+        originalRequest.headers = {
+          ...originalRequest.headers,
+          Authorization: `Bearer ${accessToken}`,
+        };
+
+        return api(originalRequest);
+      } catch (err) {
+        clearTokens();
+        return Promise.reject(err);
       }
     }
 
@@ -143,6 +150,9 @@ export interface HiringAdInput {
 }
 
 
+export interface EnhanceDescriptionResponse {
+  enhancedDescription: string;
+}
 
 
 export const authAPI = {
@@ -246,6 +256,11 @@ export const postsAPI = {
 
   updateMyHiringAd: async(data) =>{
     const response = await api.put("/api/HivGrid/hire/updateAd",data)
+    return response.data
+  },
+
+  hireAdDescriptionEnhance:async(data):Promise<EnhanceDescriptionResponse>=>{
+    const response = await api.post("/api/HivGrid/hire/enhance-description",{data})
     return response.data
   }
 };

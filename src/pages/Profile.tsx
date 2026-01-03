@@ -112,10 +112,14 @@ const Profile: React.FC = () => {
         description: "Your changes have been saved",
       });
     } catch (error: any) {
+      const apiError = error?.response?.data;
       toast({
         title: "Update failed",
         description:
-          error.response?.data?.message || "Failed to update profile",
+               apiError?.errors?.[0]?.msg ||
+               apiError?.message ||
+               "Failed to update profile",
+
         variant: "destructive",
       });
     } finally {
