@@ -7,6 +7,7 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials:true,
 });
 
 export const getAccessToken = (): string | null => {
@@ -32,6 +33,10 @@ api.interceptors.request.use(
     const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    if (!config.headers["Content-Type"]) {
+      config.headers["Content-Type"] = "application/json";
     }
     return config;
   },
@@ -59,7 +64,7 @@ api.interceptors.response.use(
       }
 //https://hiv-grid-be.vercel.app
       try {
-        const res = await axios.post(
+        const res = await api.post(
           "/api/HivGrid/auth/refreshToken",
           { refreshToken }
         );
