@@ -57,10 +57,10 @@ api.interceptors.response.use(
         clearTokens();
         return Promise.reject(error);
       }
-
+//https://hiv-grid-be.vercel.app
       try {
         const res = await axios.post(
-          "https://hiv-grid-be.vercel.app/api/HivGrid/auth/refreshToken",
+          "/api/HivGrid/auth/refreshToken",
           { refreshToken }
         );
 
