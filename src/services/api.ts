@@ -1,13 +1,12 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
-const API_BASE_URL = "https://hiv-grid-be.vercel.app"; 
+const API_BASE_URL = "https://hiv-grid-be.vercel.app/api/HivGrid"; 
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
-  },
-  withCredentials:true,
+  }
 });
 
 export const getAccessToken = (): string | null => {
@@ -62,10 +61,9 @@ api.interceptors.response.use(
         clearTokens();
         return Promise.reject(error);
       }
-//https://hiv-grid-be.vercel.app
       try {
         const res = await api.post(
-          "/api/HivGrid/auth/refreshToken",
+          "/auth/refreshToken",
           { refreshToken }
         );
 
@@ -162,7 +160,7 @@ export interface EnhanceDescriptionResponse {
 
 export const authAPI = {
   register: async (email:string, password:string, username:string,code:string) => {
-    return api.post("/api/HivGrid/auth/register", {
+    return api.post("/auth/register", {
       email,
       password,
       username,
@@ -171,40 +169,40 @@ export const authAPI = {
   },
 
   sendVerificationCode:async(email) =>{
-    return api.post("/api/HivGrid/auth/verify",{
+    return api.post("/auth/verify",{
       email
     })
   },
 
   login: async (email: string, password: string): Promise<LoginResponse> => {
-    const response = await api.post("/api/HivGrid/auth/login", { email, password });
+    const response = await api.post("/auth/login", { email, password });
     return response.data;
   },
 
   forgotPassword: async (email: string) => {
-    const response = await api.post("/api/HivGrid/auth/forgottPassword", { email });
+    const response = await api.post("/forgottPassword", { email });
     return response.data;
   },
 
   verify: async (verificationCode: string) => {
-    const response = await api.post("/api/HivGrid/auth/verify", { verificationCode });
+    const response = await api.post("/auth/verify", { verificationCode });
     return response.data;
   },
 
   refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
-    const response = await api.post("/api/HivGrid/auth/refreshToken", { refreshToken });
+    const response = await api.post("/auth/refreshToken", { refreshToken });
     return response.data;
   },
 };
 
 export const profileAPI = {
   getUserProfile: async (): Promise<LoadUserDataResponse> => {
-    const response = await api.get("/api/HivGrid/profile/userProfile");
+    const response = await api.get("/profile/userProfile");
     return response.data;
   },
 
   updateProfile: async (formData: FormData) => {
-    const response = await api.post("/api/HivGrid/profile/updateProfile", formData, {
+    const response = await api.post("/profile/updateProfile", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -213,24 +211,24 @@ export const profileAPI = {
   },
 
   deleteAccount: async () => {
-    const response = await api.post("/api/HivGrid/profile/deleteAccount");
+    const response = await api.post("/profile/deleteAccount");
     return response.data;
   },
 };
 
 export const postsAPI = {
   loadData: async (): Promise<Post[]> => {
-    const response = await api.get("/api/HivGrid/home/loadData");
+    const response = await api.get("/home/loadData");
     return response.data.data;
   },
 
   loadUserData: async (): Promise<LoadUserDataResponse> => {
-    const response = await api.get("/api/HivGrid/home/loadUserData");
+    const response = await api.get("/home/loadUserData");
     return response.data;
   },
 
   publish: async (formData: FormData): Promise<Post> => {
-    const response = await api.post("/api/HivGrid/home/publish", formData, {
+    const response = await api.post("/home/publish", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -239,33 +237,33 @@ export const postsAPI = {
   },
 
   updatePost: async(postId:string,title:string,caption:string,tags:string[])=>{
-    const response = await api.put("/api/HivGrid/post/updatePost",{postId,title,caption,tags})
+    const response = await api.put("/post/updatePost",{postId,title,caption,tags})
     return response.data
   }
 };
 
  export const hireApi = {
   createHiringAd: async (data: HiringAdInput) => {
-    const response = await api.post("/api/HivGrid/hire/publish", data);
+    const response = await api.post("/hire/publish", data);
     return response.data;
   },
   getAllHiringAds: async (): Promise<HiringAd[] > => {
-    const response = await api.get("/api/HivGrid/hire/all");
+    const response = await api.get("/hire/all");
     return response.data.data;
   },
 
   getMyHiringAd: async():Promise<HiringAd>=>{
-    const response = await api.get("/api/HivGrid/hire/getMyHiringAd")
+    const response = await api.get("/hire/getMyHiringAd")
     return response.data.data
   },
 
   updateMyHiringAd: async(data) =>{
-    const response = await api.put("/api/HivGrid/hire/updateAd",data)
+    const response = await api.put("/hire/updateAd",data)
     return response.data
   },
 
   hireAdDescriptionEnhance:async(data):Promise<EnhanceDescriptionResponse>=>{
-    const response = await api.post("/api/HivGrid/hire/enhance-description",{data})
+    const response = await api.post("/hire/enhance-description",{data})
     return response.data
   }
 };
