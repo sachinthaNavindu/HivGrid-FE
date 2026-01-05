@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
-// const API_BASE_URL = "https://hiv-grid-be.vercel.app/api/HivGrid"; 
-const API_BASE_URL = "http://localhost:8081/api/HivGrid";
+const API_BASE_URL = "https://hiv-grid-be.vercel.app/api/HivGrid"; 
+// const API_BASE_URL = "http://localhost:8081/api/HivGrid";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
