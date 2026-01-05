@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { authAPI } from '@/services/api';
-import AuthLayout from '@/components/layout/AuthLayout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { Loader2, Mail, ArrowLeft, Lock, CheckCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { authAPI } from "@/services/api";
+import AuthLayout from "@/components/layout/AuthLayout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Loader2,
+  Mail,
+  ArrowLeft,
+  Lock,
+  CheckCircle,
+  Shield,
+} from "lucide-react";
 
 const ForgotPassword: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
   const { toast } = useToast();
 
   const handleSendCode = async () => {
@@ -29,17 +39,19 @@ const ForgotPassword: React.FC = () => {
 
     setIsSendingCode(true);
     try {
-      await authAPI.forgotPassword(email);
+      await authAPI.sendVerificationCode(email);
+
       setIsCodeSent(true);
       toast({
         title: "Code sent",
-        description: "We've sent a reset code to your email.",
+        description: "A verification code has been sent to your email.",
       });
     } catch (error: any) {
-      const message = error.response?.data?.message || "Failed to send code. Please try again.";
       toast({
         title: "Request failed",
-        description: message,
+        description:
+          error.response?.data?.message ||
+          "Failed to send verification code",
         variant: "destructive",
       });
     } finally {
@@ -49,8 +61,8 @@ const ForgotPassword: React.FC = () => {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email || !newPassword) {
+
+    if (!email || !verificationCode || !newPassword) {
       toast({
         title: "Missing fields",
         description: "Please fill in all fields",
@@ -70,17 +82,23 @@ const ForgotPassword: React.FC = () => {
 
     setIsChangingPassword(true);
     try {
-      await authAPI.forgotPassword(email);
+      await authAPI.resetPassword({
+        email,
+        code: verificationCode,
+        newPassword,
+      });
+
       setIsSuccess(true);
       toast({
         title: "Password changed",
-        description: "Your password has been successfully updated.",
+        description: "Your password has been updated successfully.",
       });
     } catch (error: any) {
-      const message = error.response?.data?.message || "Failed to change password. Please try again.";
       toast({
-        title: "Request failed",
-        description: message,
+        title: "Reset failed",
+        description:
+          error.response?.data?.message ||
+          "Failed to reset password. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -90,23 +108,21 @@ const ForgotPassword: React.FC = () => {
 
   if (isSuccess) {
     return (
-      <AuthLayout 
-        title="Password Changed" 
+      <AuthLayout
+        title="Password Changed"
         subtitle="Your password has been updated successfully"
       >
         <div className="text-center space-y-6">
           <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto">
             <CheckCircle className="w-8 h-8 text-accent" />
           </div>
-          
-          <div className="space-y-2">
-            <p className="text-muted-foreground">
-              You can now log in with your new password.
-            </p>
-          </div>
+
+          <p className="text-muted-foreground">
+            You can now log in with your new password.
+          </p>
 
           <Link to="/login">
-            <Button variant="gradient" className="w-full gap-2">
+            <Button variant="gradient" className="w-full">
               Go to Login
             </Button>
           </Link>
@@ -116,20 +132,17 @@ const ForgotPassword: React.FC = () => {
   }
 
   return (
-    <AuthLayout 
-      title="Reset your password" 
-      subtitle="Enter your email and new password"
+    <AuthLayout
+      title="Reset your password"
+      subtitle="Enter your email, verification code and new password"
     >
       <form onSubmit={handleChangePassword} className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-medium text-foreground">
-            Email
-          </Label>
+          <Label>Email</Label>
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                id="email"
                 type="email"
                 placeholder="you@example.com"
                 value={email}
@@ -138,12 +151,12 @@ const ForgotPassword: React.FC = () => {
                 disabled={isSendingCode || isChangingPassword}
               />
             </div>
+
             <Button
               type="button"
               variant={isCodeSent ? "outline" : "secondary"}
               onClick={handleSendCode}
               disabled={isSendingCode || !email}
-              className="shrink-0"
             >
               {isSendingCode ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -154,21 +167,29 @@ const ForgotPassword: React.FC = () => {
               )}
             </Button>
           </div>
-          {isCodeSent && (
-            <p className="text-xs text-accent">
-              Reset code sent! Check your email.
-            </p>
-          )}
         </div>
 
+        {isCodeSent && (
+          <div className="space-y-2">
+            <Label>Verification Code</Label>
+            <div className="relative">
+              <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Enter verification code"
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+                className="pl-11"
+                disabled={isChangingPassword}
+              />
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
-          <Label htmlFor="newPassword" className="text-sm font-medium text-foreground">
-            New Password
-          </Label>
+          <Label>New Password</Label>
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              id="newPassword"
               type="password"
               placeholder="••••••••"
               value={newPassword}
@@ -179,11 +200,16 @@ const ForgotPassword: React.FC = () => {
           </div>
         </div>
 
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           variant="gradient"
           className="w-full"
-          disabled={isChangingPassword || !isCodeSent}
+          disabled={
+            isChangingPassword ||
+            !isCodeSent ||
+            !verificationCode ||
+            !newPassword
+          }
         >
           {isChangingPassword ? (
             <>
@@ -197,8 +223,8 @@ const ForgotPassword: React.FC = () => {
       </form>
 
       <div className="mt-6 text-center">
-        <Link 
-          to="/login" 
+        <Link
+          to="/login"
           className="text-sm text-primary font-medium hover:underline inline-flex items-center gap-1"
         >
           <ArrowLeft className="w-4 h-4" />

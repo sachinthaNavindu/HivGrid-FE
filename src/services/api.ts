@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
 // const API_BASE_URL = "https://hiv-grid-be.vercel.app/api/HivGrid"; 
-const API_BASE_URL = "https://hiv-grid-be.vercel.app/api/HivGrid";
+const API_BASE_URL = "http://localhost:8081/api/HivGrid";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -180,11 +180,6 @@ export const authAPI = {
     return response.data;
   },
 
-  forgotPassword: async (email: string) => {
-    const response = await api.post("/forgottPassword", { email });
-    return response.data;
-  },
-
   verify: async (verificationCode: string) => {
     const response = await api.post("/auth/verify", { verificationCode });
     return response.data;
@@ -194,7 +189,25 @@ export const authAPI = {
     const response = await api.post("/auth/refreshToken", { refreshToken });
     return response.data;
   },
+
+  resetPassword: async ({
+    email,
+    code,
+    newPassword,
+  }: {
+    email: string;
+    code: string;
+    newPassword: string;
+  }) => {
+    const response = await api.post("/auth/resetPassword", {
+      email,
+      code,
+      newPassword,
+    });
+    return response.data;
+  },
 };
+
 
 export const profileAPI = {
   getUserProfile: async (): Promise<LoadUserDataResponse> => {
