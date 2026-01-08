@@ -118,7 +118,7 @@ interface LoginResponse {
   data: AuthResponse;
 }
 
-interface LoadUserDataResponse {
+export interface LoadUserDataResponse {
   message: string;
   user: User;
   postCount: number;
@@ -170,7 +170,7 @@ export const authAPI = {
   },
 
   sendVerificationCode:async(email) =>{
-    return api.post("/auth/verify",{
+    return api.post("/auth/Registerverify",{
       email
     })
   },
@@ -208,6 +208,17 @@ export const authAPI = {
   },
 };
 
+export const userApi = {
+  warn: async (userId:string)=>{
+    const response = await api.post("admin/warn",{userId})
+    return response
+  },
+  deleteUser: async(userId:string)=>{
+    const response = await api.post("admin/delete",{userId})
+    return response
+  }
+}
+
 
 export const profileAPI = {
   getUserProfile: async (): Promise<LoadUserDataResponse> => {
@@ -228,6 +239,11 @@ export const profileAPI = {
     const response = await api.post("/profile/deleteAccount");
     return response.data;
   },
+
+  getAllusers: async () =>{
+    const response = await api.get("/admin/getAllusers")
+    return response.data
+  }
 };
 
 export const postsAPI = {
@@ -253,6 +269,11 @@ export const postsAPI = {
   updatePost: async(postId:string,title:string,caption:string,tags:string[])=>{
     const response = await api.put("/post/updatePost",{postId,title,caption,tags})
     return response.data
+  },
+
+  deletePost:async(postId:string)=>{
+    const response = await api.post("/post/deletePost",{postId})
+    return response
   }
 };
 
@@ -279,6 +300,10 @@ export const postsAPI = {
   hireAdDescriptionEnhance:async(data):Promise<EnhanceDescriptionResponse>=>{
     const response = await api.post("/hire/enhance-description",{data})
     return response.data
+  },
+  deleteHireAd:async(postId:string)=>{
+    const response = await api.post("/hire/deleteHireAd",{postId})
+    return response
   }
 };
 

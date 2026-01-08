@@ -6,7 +6,7 @@ interface AuthContextType {
   postCount: number
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   register: (email: string, password: string, username: string,code:string) => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
@@ -57,6 +57,8 @@ useEffect(() => {
     
     const userData = await postsAPI.loadUserData();
     setUser(userData.user);
+
+    return userData.user
   };
 
   const sendVerificationCode = async(email:string)=>{

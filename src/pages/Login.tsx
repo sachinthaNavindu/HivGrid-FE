@@ -20,37 +20,35 @@ const Login: React.FC = () => {
 
   const from = (location.state as any)?.from?.pathname || '/';
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !username || !password) {
-      toast({
-        title: "Missing fields",
-        description: "Please fill in all fields",
-        variant: "destructive",
-      });
-      return;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  setIsLoading(true);
+  try {
+    const user = await login(email, password);
+
+    toast({
+      title: "Welcome back!",
+      description: "You've successfully logged in.",
+    });
+
+    if (user.roles?.includes('ADMIN')) {
+      navigate('/admin', { replace: true });
+    } else {
+      navigate('/home', { replace: true });
     }
 
-    setIsLoading(true);
-    try {
-      await login(email, password);
-      toast({
-        title: "Welcome back!",
-        description: "You've successfully logged in.",
-      });
-      navigate(from, { replace: true });
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Invalid email or password";
-      toast({
-        title: "Login failed",
-        description: message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  } catch (error: any) {
+    toast({
+      title: "Login failed",
+      description: error.response?.data?.message || "Invalid credentials",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <AuthLayout 

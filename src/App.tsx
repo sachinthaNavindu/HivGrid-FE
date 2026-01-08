@@ -15,6 +15,7 @@ import CreatePost from "./pages/CreatePost";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import HirePage from "./pages/HirePage";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -30,31 +31,49 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            
-            <Route path="/home" element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            } />
-            <Route path="/create" element={
-              <ProtectedRoute>
-                <CreatePost />
-              </ProtectedRoute>
-            } />
 
-            <Route path="/hirePage" element={
-              <ProtectedRoute>
-                <HirePage />
-              </ProtectedRoute>
-            } 
-            
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <Admin />
+                </ProtectedRoute>
+              }
             />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/create"
+              element={
+                <ProtectedRoute>
+                  <CreatePost />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/hirePage"
+              element={
+                <ProtectedRoute>
+                  <HirePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
