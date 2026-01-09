@@ -29,7 +29,6 @@ The system follows a client–server architecture, applies RAD principles, and e
 
 ### **Frontend**
 - React with TypeScript
-- Redux Toolkit (State Management)
 - TailwindCSS (Responsive UI)
 - Axios
 - React Router DOM
